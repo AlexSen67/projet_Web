@@ -1,11 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <title>Application de dessin</title>
   </head>
   <body>
-    <p>Test</p>
+    <header>
+      <h1>Application de dessin</h1>
+    </header>
+    <main>
+      <section id="conteneur">
+        <div id="tableau-blanc">
+          <canvas id="canvas"></canvas>
+        </div>
+        <div class="outils">
+          <ul class="forme-liste">
+            <li class="forme-item" data-figure="crayon">✏️ Crayon</li>
+            <li class="forme-item" data-figure="gomme">🧽 Gomme</li>
+            <li class="forme-item" data-figure="effacer">🗑️ Effacer</li>
+            <li class="forme-item" data-figure="triangle">🔺 Triangle</li>
+            <li class="forme-item" data-figure="rectangle">⬛ Rectangle</li>
+            <li class="forme-item" data-figure="cercle">⚪ Cercle</li>
+            <li class="forme-item" data-figure="ligne">➖ Ligne</li>
+            <li class="forme-item" data-figure="ellipse">⭕ Ellipse</li>
+          </ul>
+          <div class="options">
+            <input type="color" id="couleur" />
+            <input type="range" id="taille" min="1" max="100" />
+          </div>
+        </div>
+        <div class="parametre">
+          <button class="clear">🧹 Effacer</button>
+          <button class="save">💾 Enregistrer</button>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

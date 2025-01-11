@@ -1,0 +1,138 @@
+/* Réinitialisation */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+header {
+  background-color: #6cd4a4;
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Conteneur principal */
+#conteneur {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+/* Canvas (tableau blanc) */
+#canvas {
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e0e0e0;
+}
+
+/* Boîte à outils */
+.outils {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 90%;
+  max-width: 500px;
+  overflow: hidden; /* Empêche les éléments de déborder */
+}
+
+/* Liste défilable de formes et outils */
+.forme-liste {
+  display: flex;
+  overflow-x: auto; /* Défilement horizontal pour mobile */
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  overflow-x: scroll; /* Défilement horizontal pour mobile */
+  max-width: 100%; /* La liste reste dans les limites de la boîte outils */
+  scrollbar-width: thin; /* Style de scrollbar pour Firefox */
+  scrollbar-color: #ccc #f0f0f0; /* Couleur de la scrollbar */
+}
+
+.forme-liste::-webkit-scrollbar {
+  height: 6px; /* Taille de la scrollbar pour les navigateurs WebKit */
+}
+.forme-liste::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.forme-item {
+  flex: 0 0 auto; /* Empêche les items de rétrécir */
+  width: 90px; /* Largeur fixe pour chaque item */
+  height: 20px; /* Hauteur fixe pour chaque item */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  white-space: nowrap; /* Empêche le texte de passer à la ligne */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.forme-item:hover {
+  background-color: #6cd4a4;
+}
+
+/* Options de couleur et de taille */
+.options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Options de couleur */
+input[type="color"] {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Options de taille */
+input[type="range"] {
+  width: 150px;
+  cursor: pointer;
+}
+
+.parametre {
+  display: flex;
+  justify-content: space-around;
+  align-content: center;
+  margin: 1.5rem;
+  padding: 0.5rem;
+  width: 60%;
+  height: 40px;
+}
+.parametre .clear,
+.parametre .save {
+  background-color: #6cd4a4;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+  box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1);
+}
