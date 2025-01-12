@@ -11,17 +11,35 @@
       <h1>Application de dessin</h1>
     </header>
     <main>
+      <!-- Section Description -->
+      <section id="description">
+        <h2>Bienvenue sur mon Application de dessin</h2>
+        <p>
+          Cette application de dessin vous permet de créer des formes, de
+          personnaliser leurs couleurs et tailles, et d'enregistrer vos
+          créations. Ce projet utilise le langage JavaScript, l'API
+          <span style="font-weight: bold">Canvas</span> et les fonctionnalités
+          de touch screen . Cette API nous permet de dessiner, faire de
+          l'animation, de la simulation et donc faire des jeux en 2D ou 3D sur
+          Chrome.
+        </p>
+        <p>
+          Vous trouverez ci-dessous des moyens pour tester ce que cette API peut
+          nous offrir pour des projets web moderne.
+        </p>
+      </section>
+      <!-- Section Application -->
       <section id="conteneur">
         <div id="tableau-blanc">
-          <canvas id="canvas" width="430" height="300"></canvas>
+          <canvas id="canvas"></canvas>
         </div>
         <div class="outils">
           <ul class="forme-liste">
             <li class="forme-item" data-figure="crayon">✏️ Crayon</li>
             <li class="forme-item" data-figure="gomme">🧽 Gomme</li>
-            <li class="forme-item" data-figure="demo">🗑️ Demo</li>
-            <li class="forme-item" data-figure="triangle">🔺 Triangle</li>
-            <li class="forme-item" data-figure="rectangle">⬛ Rectangle</li>
+            <li class="forme-item" data-figure="demo">🎬 Demo</li>
+            <li class="forme-item" data-figure="triangle">🛆 Triangle</li>
+            <li class="forme-item" data-figure="rectangle">🔲 Rectangle</li>
             <li class="forme-item" data-figure="cercle">⚪ Cercle</li>
             <li class="forme-item" data-figure="ligne">➖ Ligne</li>
             <li class="forme-item" data-figure="ellipse">⭕ Ellipse</li>

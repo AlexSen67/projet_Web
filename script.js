@@ -3,16 +3,29 @@ const earth = new Image();
 const etoilesBackground = new Image();
 const ctx = document.getElementById("canvas").getContext("2d");
 
+// Redimensionner le canvas pour s'adapter à la fenêtre
+function resizeCanvas() {
+  const canvas = document.getElementById("canvas");
+
+  // Définir une taille en fonction de l'écran tout en gardant une limite minimale
+  canvas.width = Math.max(430, window.innerWidth * 0.9); // Au moins 430px
+  canvas.height = Math.max(300, window.innerHeight * 0.6); // Au moins 300px
+}
+
 function init() {
+  resizeCanvas(); // Appeler la fonction pour définir les dimensions initiales du canvas
   etoilesBackground.src = "./assets/stars.png";
   moon.src = "./assets/moon.png";
   earth.src = "./assets/earth.png";
   window.requestAnimationFrame(draw);
 }
 
+// Met à jour la taille du canvas à chaque redimensionnement de la fenêtre
+window.addEventListener("resize", resizeCanvas);
+
 function drawSun() {
   ctx.save();
-  ctx.translate(215, 150); // Positionne le soleil au centre du canvas
+  ctx.translate(canvas.width / 2, canvas.height / 2); // Positionne le soleil au centre du canvas
 
   // Rayons du soleil
   ctx.fillStyle = "rgba(255, 204, 0, 0.6)"; // Couleur des rayons
@@ -35,10 +48,9 @@ function drawSun() {
 }
 
 function draw() {
-  // Efface le canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // Dessiner l'image de fond (espace)
-  ctx.drawImage(etoilesBackground, 0, 0, canvas.width, canvas.height); // L'image couvre tout le canvas
+  // Efface le canvas et dessine un fond noir
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+  ctx.drawImage(etoilesBackground, 0, 0, canvas.width, canvas.height); // Fond noir
 
   ctx.fillStyle = "rgb(0 0 0 / 40%)";
   ctx.strokeStyle = "rgb(0 153 255 / 40%)";
@@ -47,7 +59,7 @@ function draw() {
   drawSun();
 
   ctx.save();
-  ctx.translate(215, 150); // Centre du canvas ajusté
+  ctx.translate(canvas.width / 2, canvas.height / 2); // Centre du canvas ajusté
 
   // Terre
   const time = new Date();
@@ -75,10 +87,11 @@ function draw() {
 
   // Orbite de la Terre
   ctx.beginPath();
-  ctx.arc(215, 150, 130, 0, Math.PI * 2, false); // Orbite
+  ctx.arc(canvas.width / 2, canvas.height / 2, 130, 0, Math.PI * 2, false); // Orbite
   ctx.stroke();
 
   window.requestAnimationFrame(draw);
 }
 
 init();
+resizeCanvas();
