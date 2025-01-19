@@ -1,28 +1,148 @@
+// ==================== Variables globales et des états =============================
+
 const moon = new Image();
 const earth = new Image();
 const etoilesBackground = new Image();
 const ctx = document.getElementById("canvas").getContext("2d");
+const outilItems = document.querySelectorAll(".forme-item");
+const crayon = document.getElementById("crayon");
+const clearButton = document.querySelector(".clear");
+const saveButton = document.querySelector(".save");
+const colorPicker = document.getElementById("couleur");
+const sizePicker = document.getElementById("taille");
+
+// Variables d'état
+let currentTool = "crayon"; // Outil actif par défaut
+let isDrawing = false;
+let lastX = 0; // Dernière position X
+let lastY = 0; // Dernière position Y
+let animationFrameId = null; // ID de l'animation en cours
+let isDemoRunning = false; // Indique si l'animation est en cours
+
+// Liste des outils possibles
+const tools = {
+  crayon: "crayon",
+  gomme: "gomme",
+  triangle: "triangle",
+  rectangle: "rectangle",
+  cercle: "cercle",
+  ligne: "ligne",
+  ellipse: "ellipse",
+};
+
+// Configuration initiale du contexte de dessin
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+
+// Gestion de la sélection des outils
+outilItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    outilItems.forEach((el) => el.classList.remove("selected")); // Retirer les sélections
+    item.classList.add("selected"); // Ajouter la classe "selected" à l'élément cliqué
+    currentTool = item.dataset.figure; // Définir l'outil actif
+  });
+});
+
+// =====================  Fonctions  ====================================
+
+// Fonction pour obtenir les coordonnées correctes, en prenant en compte les écrans tactiles
+function getCoordinates(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+  // Ajuste les coordonnées en fonction des dimensions réelles du canvas
+  const xPos = x - rect.left;
+  const yPos = y - rect.top;
+
+  return { x: xPos, y: yPos };
+}
+
+// Gestion des événements de dessin (version mobile et souris)
+function startDrawing(e) {
+  const { x, y } = getCoordinates(e);
+
+  // On ne commence à dessiner que si l'outil est le "crayon"
+  if (currentTool !== "crayon" && currentTool !== "gomme") return;
+
+  isDrawing = true;
+  [lastX, lastY] = [x, y]; // Stocke la dernière position X et Y
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const { x, y } = getCoordinates(e);
+
+  switch (currentTool) {
+    case "crayon":
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = colorPicker.value; // Couleur du crayon
+      ctx.lineWidth = sizePicker.value; // Taille du crayon
+      ctx.shadowBlur = 2; // Ajout d'un effet d'ombre
+      ctx.shadowColor = colorPicker.value; // Couleur de l'ombre égale à la couleur du crayon
+      ctx.stroke();
+      ctx.shadowBlur = 0; // Désactivation de l'ombre après le trait
+      break;
+
+    case "gomme":
+      ctx.clearRect(x - 10, y - 10, sizePicker.value, sizePicker.value); // Efface la zone autour du curseur
+      break;
+
+    default:
+      break;
+  }
+
+  [lastX, lastY] = [x, y]; // Mise à jour des coordonnées
+}
+
+// =========== fonctions d'arret de dessin et d'animation ==============
+function stopDrawing() {
+  isDrawing = false;
+}
+
+// Fonction pour arrêter l'animation
+function stopAnimation() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId); // Arrête l'animation
+    animationFrameId = null;
+    isDemoRunning = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Nettoie le canvas
+  }
+
+  // Réinitialiser les états de dessin
+  isDrawing = false;
+  lastX = 0;
+  lastY = 0;
+
+  // Réinitialiser les styles du contexte si nécessaire
+  ctx.lineWidth = sizePicker.value;
+  ctx.strokeStyle = colorPicker.value;
+}
+// ======================================================================
 
 // Redimensionner le canvas pour s'adapter à la fenêtre
 function resizeCanvas() {
   const canvas = document.getElementById("canvas");
 
   // Définir une taille en fonction de l'écran tout en gardant une limite minimale
-  canvas.width = Math.max(430, window.innerWidth * 0.9); // Au moins 430px
-  canvas.height = Math.max(300, window.innerHeight * 0.6); // Au moins 300px
+  canvas.width = Math.max(430, window.innerWidth * 0.7); // Au moins 430px
+  canvas.height = Math.max(700, window.innerHeight * 0.6); // Au moins 300px
 }
 
 function init() {
-  resizeCanvas(); // Appeler la fonction pour définir les dimensions initiales du canvas
+  if (isDemoRunning) stopAnimation();
   etoilesBackground.src = "./assets/stars.png";
   moon.src = "./assets/moon.png";
   earth.src = "./assets/earth.png";
-  window.requestAnimationFrame(draw);
+  isDemoRunning = true;
+
+  animationFrameId = window.requestAnimationFrame(demo);
 }
 
 // Met à jour la taille du canvas à chaque redimensionnement de la fenêtre
 window.addEventListener("resize", resizeCanvas);
-
 function drawSun() {
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2); // Positionne le soleil au centre du canvas
@@ -47,9 +167,8 @@ function drawSun() {
   ctx.restore();
 }
 
-function draw() {
+function demo() {
   // Efface le canvas et dessine un fond noir
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
   ctx.drawImage(etoilesBackground, 0, 0, canvas.width, canvas.height); // Fond noir
 
   ctx.fillStyle = "rgb(0 0 0 / 40%)";
@@ -84,14 +203,79 @@ function draw() {
   ctx.restore();
 
   ctx.restore();
-
   // Orbite de la Terre
   ctx.beginPath();
   ctx.arc(canvas.width / 2, canvas.height / 2, 130, 0, Math.PI * 2, false); // Orbite
+
+  ctx.lineWidth = 1; // ne pas prendre en compte sizePicker
   ctx.stroke();
 
-  window.requestAnimationFrame(draw);
+  animationFrameId = window.requestAnimationFrame(demo);
 }
 
-init();
-resizeCanvas();
+// =====================  Événements  ====================================
+
+// Ajoute l'événement pour lancer la démo lorsqu'un élément <li> avec data-figure="demo" est cliqué
+document
+  .querySelector('[data-figure="demo"]')
+  .addEventListener("click", function () {
+    init();
+  });
+
+// Ajouter les événements tactiles et souris
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDrawing);
+canvas.addEventListener("mouseout", stopDrawing);
+
+canvas.addEventListener("touchstart", startDrawing);
+canvas.addEventListener("touchmove", draw);
+canvas.addEventListener("touchend", stopDrawing);
+canvas.addEventListener("touchcancel", stopDrawing);
+
+// Gestion des options (couleur et taille)
+colorPicker.addEventListener("input", (e) => {
+  ctx.strokeStyle = e.target.value;
+});
+
+sizePicker.addEventListener("input", (e) => {
+  ctx.lineWidth = e.target.value; // Met à jour la taille du crayon
+  console.log(`Taille du crayon : ${e.target.value}`);
+});
+
+// Fonctionnalité "Effacer"
+clearButton.addEventListener("click", () => {
+  stopAnimation();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+// Fonctionnalité "Enregistrer"
+saveButton.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = "dessin.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
+
+// =====================  Initialisation et Resize ======================
+
+window.addEventListener("load", () => {
+  // Récupère l'élément du crayon
+  const crayonItem = document.querySelector('[data-figure="crayon"]');
+
+  // Applique la classe 'selected' au crayon
+  crayonItem.classList.add("selected");
+
+  // Met à jour l'outil actif sur 'crayon'
+  currentTool = "crayon";
+  // Récupère le canvas
+  const canvas = document.getElementById("canvas");
+
+  // Met à jour la taille du canvas selon les dimensions CSS (et la taille maximale que tu souhaites)
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  // Les autres configurations
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+});
