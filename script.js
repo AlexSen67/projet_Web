@@ -122,14 +122,19 @@ function stopAnimation() {
 }
 // ======================================================================
 
-// Redimensionner le canvas pour s'adapter à la fenêtre
-function resizeCanvas() {
-  const canvas = document.getElementById("canvas");
+// Met à jour la résolution interne du canvas
+// function resizeCanvas() {
+//   // Prend la largeur calculée par le CSS
+//   const width = canvas.clientWidth;
+//   const height = canvas.clientHeight; // Utilise 700px comme défini dans le CSS
 
-  // Définir une taille en fonction de l'écran tout en gardant une limite minimale
-  canvas.width = Math.max(430, window.innerWidth * 0.7); // Au moins 430px
-  canvas.height = Math.max(700, window.innerHeight * 0.6); // Au moins 300px
-}
+//   // Applique ces dimensions internes au canvas pour une meilleure qualité
+//   canvas.width = width;
+//   canvas.height = height;
+// }
+
+// // Appelle la fonction une première fois pour initialiser le canvas
+// resizeCanvas();
 
 function init() {
   if (isDemoRunning) stopAnimation();
@@ -141,8 +146,6 @@ function init() {
   animationFrameId = window.requestAnimationFrame(demo);
 }
 
-// Met à jour la taille du canvas à chaque redimensionnement de la fenêtre
-window.addEventListener("resize", resizeCanvas);
 function drawSun() {
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2); // Positionne le soleil au centre du canvas
@@ -241,6 +244,8 @@ colorPicker.addEventListener("input", (e) => {
 sizePicker.addEventListener("input", (e) => {
   ctx.lineWidth = e.target.value; // Met à jour la taille du crayon
   console.log(`Taille du crayon : ${e.target.value}`);
+  // console.log(`Largeur du canvas : ${canvas.width}`);
+  // console.log(`Hauteur du canvas : ${canvas.height}`);
 });
 
 // Fonctionnalité "Effacer"
