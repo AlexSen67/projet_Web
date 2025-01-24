@@ -12,7 +12,7 @@ const colorPicker = document.getElementById("couleur");
 const sizePicker = document.getElementById("taille");
 
 // Variables d'état
-let currentTool = "crayon"; // Outil actif par défaut
+let currentTool; // Outil actif par défaut
 let isDrawing = false;
 let lastX = 0; // Dernière position X
 let lastY = 0; // Dernière position Y
@@ -23,11 +23,18 @@ let isDemoRunning = false; // Indique si l'animation est en cours
 const tools = {
   crayon: "crayon",
   gomme: "gomme",
-  triangle: "triangle",
   rectangle: "rectangle",
+  triangle: "triangle",
   cercle: "cercle",
   ligne: "ligne",
   ellipse: "ellipse",
+};
+
+// Liste des événements pour les écrans tactiles et les souris
+const events = {
+  start: ["mousedown", "touchstart"],
+  move: ["mousemove", "touchmove"],
+  end: ["mouseup", "touchend"],
 };
 
 // Configuration initiale du contexte de dessin
@@ -35,11 +42,21 @@ ctx.lineCap = "round";
 ctx.lineJoin = "round";
 
 // Gestion de la sélection des outils
+// Ajouter un écouteur d'événement pour chaque outil
 outilItems.forEach((item) => {
   item.addEventListener("click", () => {
-    outilItems.forEach((el) => el.classList.remove("selected")); // Retirer les sélections
-    item.classList.add("selected"); // Ajouter la classe "selected" à l'élément cliqué
-    currentTool = item.dataset.figure; // Définir l'outil actif
+    // Retirer la classe "selected" de tous les outils
+    outilItems.forEach((el) => el.classList.remove("selected"));
+
+    // Ajouter la classe "selected" à l'élément cliqué
+    item.classList.add("selected");
+
+    // Définir l'outil actif
+    currentTool = item.dataset.figure;
+
+    if (currentTool !== "demo") stopAnimation(); // Arrête l'animation si un outil est sélectionné{
+
+    console.log(`Outil sélectionné : ${currentTool}`); // Vérification dans la console
   });
 });
 
@@ -63,7 +80,12 @@ function startDrawing(e) {
   const { x, y } = getCoordinates(e);
 
   // On ne commence à dessiner que si l'outil est le "crayon"
-  if (currentTool !== "crayon" && currentTool !== "gomme") return;
+  if (
+    currentTool !== "crayon" &&
+    currentTool !== "gomme" &&
+    currentTool !== "rectangle"
+  )
+    return;
 
   isDrawing = true;
   [lastX, lastY] = [x, y]; // Stocke la dernière position X et Y
@@ -72,7 +94,6 @@ function startDrawing(e) {
 function draw(e) {
   if (!isDrawing) return;
   const { x, y } = getCoordinates(e);
-
   switch (currentTool) {
     case "crayon":
       ctx.beginPath();
@@ -88,15 +109,29 @@ function draw(e) {
 
     case "gomme":
       ctx.clearRect(x - 10, y - 10, sizePicker.value, sizePicker.value); // Efface la zone autour du curseur
+      console.log("Effacer");
       break;
+    case "rectangle":
+      // Dimensions du rectangle
+      const rectWidth = 150; // Largeur du rectangle
+      const rectHeight = 100; // Hauteur du rectangle
 
+      // Calcul des coordonnées pour centrer le rectangle au clic
+      const startX = x - rectWidth / 2;
+      const startY = y - rectHeight / 2;
+      // Dessine un rectangle temporaire pour montrer l'aperçu
+      stopAnimation(); // Empêche l'interférence avec d'autres animations
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizePicker.value;
+      // Dessiner le rectangle
+      ctx.strokeRect(startX, startY, rectWidth, rectHeight);
+      break;
     default:
       break;
   }
 
   [lastX, lastY] = [x, y]; // Mise à jour des coordonnées
 }
-
 // =========== fonctions d'arret de dessin et d'animation ==============
 function stopDrawing() {
   isDrawing = false;
@@ -225,16 +260,10 @@ document
     init();
   });
 
-// Ajouter les événements tactiles et souris
-canvas.addEventListener("mousedown", startDrawing);
-canvas.addEventListener("mousemove", draw);
-canvas.addEventListener("mouseup", stopDrawing);
-canvas.addEventListener("mouseout", stopDrawing);
-
-canvas.addEventListener("touchstart", startDrawing);
-canvas.addEventListener("touchmove", draw);
-canvas.addEventListener("touchend", stopDrawing);
-canvas.addEventListener("touchcancel", stopDrawing);
+// Ajouter les événements tactiles et souris pour le dessin
+events.start.forEach((event) => canvas.addEventListener(event, startDrawing));
+events.move.forEach((event) => canvas.addEventListener(event, draw));
+events.end.forEach((event) => canvas.addEventListener(event, stopDrawing));
 
 // Gestion des options (couleur et taille)
 colorPicker.addEventListener("input", (e) => {
@@ -265,17 +294,6 @@ saveButton.addEventListener("click", () => {
 // =====================  Initialisation et Resize ======================
 
 window.addEventListener("load", () => {
-  // Récupère l'élément du crayon
-  const crayonItem = document.querySelector('[data-figure="crayon"]');
-
-  // Applique la classe 'selected' au crayon
-  crayonItem.classList.add("selected");
-
-  // Met à jour l'outil actif sur 'crayon'
-  currentTool = "crayon";
-  // Récupère le canvas
-  const canvas = document.getElementById("canvas");
-
   // Met à jour la taille du canvas selon les dimensions CSS (et la taille maximale que tu souhaites)
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;

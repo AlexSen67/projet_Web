@@ -9,7 +9,7 @@ html {
 }
 
 header {
-  background-color: #6cd4a4;
+  background-color: #ccaef3;
   color: #ffffff;
   padding: 1rem;
   text-align: center;
@@ -102,7 +102,8 @@ header {
 }
 
 .forme-item:hover {
-  background-color: #6cd4a4;
+  background-color: #ccaef3;
+  color: #fff;
 }
 
 /* Options de couleur et de taille */
@@ -136,12 +137,11 @@ input[type="range"] {
   padding: 0.5rem;
   width: 100%;
   max-width: 500px;
-
   height: 40px;
 }
 .parametre .clear,
 .parametre .save {
-  background-color: #6cd4a4;
+  background-color: #ccaef3;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -151,7 +151,7 @@ input[type="range"] {
   box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1);
 }
 
-.forme-item[data-figure="crayon"].selected {
-  background-color: #6cd4a4;
+.selected {
+  background-color: #ccaef3;
   color: white;
 }
