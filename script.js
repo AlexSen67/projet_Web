@@ -1,4 +1,16 @@
 // ==================== Variables globales et des états =============================
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        console.log("Service Worker enregistré avec succès:", registration);
+      })
+      .catch((error) => {
+        console.log("Échec de l'enregistrement du Service Worker:", error);
+      });
+  });
+}
 
 const moon = new Image();
 const earth = new Image();
@@ -26,8 +38,8 @@ const tools = {
   rectangle: "rectangle",
   triangle: "triangle",
   cercle: "cercle",
-  ligne: "ligne",
-  ellipse: "ellipse",
+  ligne: "smiley",
+  ellipse: "coeur",
 };
 
 // Liste des événements pour les écrans tactiles et les souris
@@ -79,14 +91,6 @@ function getCoordinates(e) {
 function startDrawing(e) {
   const { x, y } = getCoordinates(e);
 
-  // On ne commence à dessiner que si l'outil est le "crayon"
-  if (
-    currentTool !== "crayon" &&
-    currentTool !== "gomme" &&
-    currentTool !== "rectangle"
-  )
-    return;
-
   isDrawing = true;
   [lastX, lastY] = [x, y]; // Stocke la dernière position X et Y
 }
@@ -106,7 +110,6 @@ function draw(e) {
       ctx.stroke();
       ctx.shadowBlur = 0; // Désactivation de l'ombre après le trait
       break;
-
     case "gomme":
       ctx.clearRect(x - 10, y - 10, sizePicker.value, sizePicker.value); // Efface la zone autour du curseur
       console.log("Effacer");
@@ -115,7 +118,6 @@ function draw(e) {
       // Dimensions du rectangle
       const rectWidth = 150; // Largeur du rectangle
       const rectHeight = 100; // Hauteur du rectangle
-
       // Calcul des coordonnées pour centrer le rectangle au clic
       const startX = x - rectWidth / 2;
       const startY = y - rectHeight / 2;
@@ -125,6 +127,43 @@ function draw(e) {
       ctx.lineWidth = sizePicker.value;
       // Dessiner le rectangle
       ctx.strokeRect(startX, startY, rectWidth, rectHeight);
+      break;
+    case "triangle":
+      // Dessiner un triangle
+      stopAnimation();
+      ctx.beginPath();
+      ctx.moveTo(x, y - 50); // Sommet supérieur
+      ctx.lineTo(x + 50, y + 50); // Coin inférieur droit
+      ctx.lineTo(x - 50, y + 50); // Coin inférieur gauche
+      ctx.closePath();
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizePicker.value;
+      ctx.stroke();
+      break;
+    case "smiley":
+      stopAnimation();
+      ctx.beginPath();
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizePicker.value;
+      ctx.arc(x, y, 50, 0, Math.PI * 2, true); // Outer circle
+      ctx.moveTo(x + 35, y);
+      ctx.arc(x, y, 35, 0, Math.PI, false); // Mouth (clock
+      ctx.moveTo(x - 10, y - 10);
+      ctx.arc(x - 15, y - 10, 5, 0, Math.PI * 2, true); // Left eye
+      ctx.moveTo(x + 20, y - 10);
+      ctx.arc(x + 15, y - 10, 5, 0, Math.PI * 2, true); // Right eye
+      ctx.stroke();
+      break;
+    case "coeur":
+      stopAnimation();
+      ctx.beginPath();
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizePicker.value;
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x + 50, y - 50, x + 90, y + 20, x, y + 70);
+      ctx.bezierCurveTo(x - 90, y + 20, x - 50, y - 50, x, y);
+      ctx.stroke();
+      ctx.fill();
       break;
     default:
       break;
@@ -155,21 +194,7 @@ function stopAnimation() {
   ctx.lineWidth = sizePicker.value;
   ctx.strokeStyle = colorPicker.value;
 }
-// ======================================================================
-
-// Met à jour la résolution interne du canvas
-// function resizeCanvas() {
-//   // Prend la largeur calculée par le CSS
-//   const width = canvas.clientWidth;
-//   const height = canvas.clientHeight; // Utilise 700px comme défini dans le CSS
-
-//   // Applique ces dimensions internes au canvas pour une meilleure qualité
-//   canvas.width = width;
-//   canvas.height = height;
-// }
-
-// // Appelle la fonction une première fois pour initialiser le canvas
-// resizeCanvas();
+// =========================== Demo ====================================
 
 function init() {
   if (isDemoRunning) stopAnimation();
@@ -292,7 +317,6 @@ saveButton.addEventListener("click", () => {
 });
 
 // =====================  Initialisation et Resize ======================
-
 window.addEventListener("load", () => {
   // Met à jour la taille du canvas selon les dimensions CSS (et la taille maximale que tu souhaites)
   canvas.width = canvas.offsetWidth;
